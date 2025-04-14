@@ -7,27 +7,29 @@ Este proyecto implementa la lógica y la interfaz visual básica de un cubo Rubi
 
 ## 🎯 Objetivo
 
-Desarrollar una representación lógica y visual del cubo Rubik que permita simular sus movimientos, respetando las reglas de rotación y estructura del cubo. El proyecto pone énfasis en la **inmutabilidad**, el uso de **funciones puras** y la **recursión**, elementos esenciales del enfoque funcional.
+Desarrollar una representación lógica y visual del cubo Rubik que permita simular sus movimientos, respetando las reglas de rotación y estructura del cubo. El proyecto pone énfasis en el uso de **funciones puras** y la **recursión**, elementos esenciales del enfoque funcional.
 
 ## 🧠 Características
-
 - Representación funcional del estado del cubo.
-- Implementación de movimientos básicos (U, D, L, R, F, B y sus variantes inversas).
-- Visualización interactiva usando la librería `2htdp/image` y `2htdp/universe`.
-- Separación clara entre lógica y vista.
+- La representacion se hará de manera que la funcion principal sea la siguiente: `(RS X Cubo Movs)`, siendo X el parametro que define la dimension del cubo (2x2,3x3,4x4,5x5 o 6x6), mientras que Cubo será una lista con el estado inicial del Cubo y por último Movs contendrá una lista con los movimientos basicos que se quieran aplicar al cubo. 
+- Implementación de movimientos básicos. Para mover las filas (F), seguido del numero de fila (1,2,3..6), y por último A(**A**rriba) o B(a**B**ajo) según si el movimiento es hacia arriba o abajo, de la misma manera para las columnas. Ejemplos: F1A, C3B, F3B, C4A).
+- Separación clara entre la implementación de la parte lógica y el desarrollo visual.
 - Sin uso de variables mutables, loops imperativos o estructuras propias del paradigma imperativo.
 
 ## 🛠️ Tecnologías y herramientas
 
+
 - **Lenguaje:** Racket
 - **Paradigma:** Funcional
-- **Librerías:** 
-  - `2htdp/image` para la representación visual.
-  - `2htdp/universe` para la interacción y visualización en tiempo real.
+- **Librerías:**
+  - `toolkit` para la interfaz gráfica funcional.
+  - `racket/gui/base` como base de ventanas y gráficos.
+
 
 ## 📚 Contenidos del repositorio
 
-- `main.rkt`: archivo principal con la lógica funcional y visual.
+- `main.rkt`: archivo principal con la lógica funcional. 
+- `visual.rkt`: archivo con la parte visual de la aplicación
 - `readme.md`: este archivo.
 - `screenshots/`: ejemplos visuales del cubo (opcional).
 
