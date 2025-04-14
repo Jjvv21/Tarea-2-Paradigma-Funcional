@@ -33,23 +33,15 @@ Desarrollar una representación lógica y visual del cubo Rubik que permita simu
 - `readme.md`: este archivo.
 - `screenshots/`: ejemplos visuales del cubo (opcional).
 
-## 🚀 Ejecución
-
-Para ejecutar el programa, abre `main.rkt` en DrRacket y haz clic en *Run*. Asegúrate de tener seleccionadas las librerías de `2htdp` en el lenguaje.
-
 ## 📌 Estado del proyecto
 
 En desarrollo. Actualmente se encuentra implementada la lógica base del cubo y una interfaz visual sencilla. Se planea agregar:
 
 - Rotaciones múltiples
 - Aleatorización de estado inicial
-- Validación de estado resuelto
 - Animaciones de movimientos
 
 ## 📖 Créditos
 
-Proyecto desarrollado por [Tu Nombre] como parte del curso de *Paradigmas de Programación* (2025).
+Proyecto desarrollado por Julio Varela Venegas, Yerik Chaves Serrano y Gabriel Nuñez Morales  como parte del curso de *Paradigmas de Programación* (2025).
 
----
-
-¡Gracias por visitar el repositorio! Cualquier sugerencia o comentario es bienvenido.
