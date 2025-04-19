@@ -127,35 +127,43 @@
 
 
 (define (mov_fila_derecha dimension cubo n movimientos)
+  (display cubo)
+  (newline)
   (display "Realizar movimiento fila: ")
   (display n)
   (display " a la derecha")
   (newline)
-  (display (elegir_movimiento dimension (mov_derecha dimension cubo cubo n '() '() 1 0) (cdr movimientos))))
+  (elegir_movimiento dimension (mov_derecha dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
 (define (mov_fila_izquierda dimension cubo n movimientos)
+  (display cubo)
+  (newline)
   (display "Realizar movimiento fila: ")
   (display n)
   (display " a la izquierda")
   (newline)
-  (elegir_movimiento dimension cubo (cdr movimientos)))
+  (elegir_movimiento dimension (mov_izquierda dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
 (define (mov_columna_arriba dimension cubo n movimientos)
+  (display cubo)
+  (newline)
   (display "Realizar movimiento columna: ")
   (display n)
   (display " hacia arriba")
   (newline)
-  (elegir_movimiento dimension cubo (cdr movimientos)))
+  (elegir_movimiento dimension (mov_arriba dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
 (define (mov_columna_abajo dimension cubo n movimientos)
+  (display cubo)
+  (newline)
   (display "Realizar movimiento columna: ")
   (display n)
   (display " hacia abajo")
   (newline)
-  (elegir_movimiento dimension cubo (cdr movimientos)))
+  (elegir_movimiento dimension (mov_abajo dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
 
-
+;;FUNCION LOGICA MOVIMIENTO FILA A LA DERECHA;;
 (define (mov_derecha dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
   (else(cond((= cara 1)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (car cubo)))) (+ cara 1) 0))
@@ -168,10 +176,13 @@
 
          ((= cara 3)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (caddr cubo)))) (+ cara 1) 0))
                            ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caaddr cubo))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadr(cddddr cubo)) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo(cadr(cddddr cubo)) dimension) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
          
-         ((= cara 4) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(cadddr cubo)))) (+ cara 1) 0) )
-         ((= cara 5) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(car(cddddr cubo))))) (+ cara 1) 0) )
+         ((= cara 4) (cond ((= n 1) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-antihoraria (cadddr cubo) dimension)))) (+ cara 1) 0) )
+                           (else (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(cadddr cubo)))) (+ cara 1) 0) )))
+                     
+         ((= cara 5) (cond ((= n dimension) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-horaria (car(cddddr cubo)) dimension)))) (+ cara 1) 0) )
+                           (else (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(car(cddddr cubo))))) (+ cara 1) 0) )))
          
          ((= cara 6)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (caddr(cdddr cubo))))) (+ cara 1) 0))
                            ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
@@ -179,18 +190,102 @@
          ))     
   ))
 
+;;FUNCION LOGICA MOVIMIENTO FILA A LA IZQUIERDA;;
+(define (mov_izquierda dimension cuboOG cubo n result lista cara cuadro)
+  (cond((> cara 6) lista)
+  (else(cond((= cara 1)(cond((>= cuadro (* dimension n)) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (list(append result (car cubo)))) (+ cara 1) 0))
+                           ((< cuadro (* dimension (- n 1)))(mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar cubo))) lista cara (+ cuadro 1)))
+                           (else (mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadr cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+            
+         ((= cara 2)(cond((>= cuadro (* dimension n)) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (list(append result (cadr cubo)))) (+ cara 1) 0))
+                           ((< cuadro (* dimension (- n 1)))(mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr cubo))) lista cara (+ cuadro 1)))
+                           (else (mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo(cadr(cddddr cubo)) dimension) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+
+         ((= cara 3)(cond((>= cuadro (* dimension n)) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (list(append result (caddr cubo)))) (+ cara 1) 0))
+                           ((< cuadro (* dimension (- n 1)))(mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caaddr cubo))) lista cara (+ cuadro 1)))
+                           (else (mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+         
+         ((= cara 4) (cond ((= n 1) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-horaria (cadddr cubo) dimension)))) (+ cara 1) 0) )
+                           (else (mov_izquierda dimension cuboOG cuboOG n '() (append lista (append result (list(cadddr cubo)))) (+ cara 1) 0) )))
+                     
+         ((= cara 5) (cond ((= n dimension) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-antihoraria (car(cddddr cubo)) dimension)))) (+ cara 1) 0) )
+                           (else (mov_izquierda dimension cuboOG cuboOG n '() (append lista (append result (list(car(cddddr cubo))))) (+ cara 1) 0) )))
+         
+         ((= cara 6)(cond((>= cuadro (* dimension n)) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (list(append result (caddr(cdddr cubo))))) (+ cara 1) 0))
+                           ((< cuadro (* dimension (- n 1)))(mov_izquierda dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_izquierda dimension cuboOG (actCubo cubo cara 0 1 '()) n (append result (list(obtener-elemento (espejo (caddr cubo) dimension) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+         ))
+  ))
+
+;;FUNCION LOGICA MOVIMIENTO COLUMNA HACIA ABAJO;;
+(define (mov_abajo dimension cuboOG cubo n result lista cara cuadro)
+  (cond((> cara 6) lista)
+  (else(cond((= cara 1)(cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar cubo))) lista cara (+ cuadro 1)))
+                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadddr cubo) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+            
+         ((= cara 2) (cond ((= n dimension) (mov_abajo dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-antihoraria (cadr cubo) dimension)))) (+ cara 1) 0) )
+                           (else(mov_abajo dimension cuboOG cuboOG n '() (append lista (append result (list(cadr cubo))) ) (+ cara 1) 0) )))
+
+         ((= cara 3) (cond ((= n 1) (mov_abajo dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-horaria (caddr cubo) dimension)))) (+ cara 1) 0) )
+                           (else (mov_abajo dimension cuboOG cuboOG n '() (append lista (append result (list(caddr cubo)))) (+ cara 1) 0) ) ))
+         
+         ((= cara 4) (cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(car(cadddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (cadr(cddddr cubo)) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+
+         ((= cara 5) (cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar(cddddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car cubo) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+         
+         ((= cara 6)(cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car(cddddr cubo)) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+         ))
+  ))
+
+;;FUNCION LOGICA MOVIMIENTO COLUMNA HACIA ARRIBA;;
+(define (mov_arriba dimension cuboOG cubo n result lista cara cuadro)
+  (cond((> cara 6) lista)
+  (else(cond((= cara 1)(cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar cubo))) lista cara (+ cuadro 1)))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car(cddddr cubo)) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+            
+         ((= cara 2) (cond ((= n dimension) (mov_arriba dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-horaria (cadr cubo) dimension)))) (+ cara 1) 0) )
+                           (else(mov_arriba dimension cuboOG cuboOG n '() (append lista (append result (list(cadr cubo))) ) (+ cara 1) 0) )))
+
+         ((= cara 3) (cond ((= n 1) (mov_arriba dimension cuboOG cuboOG n '() (append lista (append result (list(rotar-antihoraria (caddr cubo) dimension)))) (+ cara 1) 0) )
+                           (else (mov_arriba dimension cuboOG cuboOG n '() (append lista (append result (list(caddr cubo)))) (+ cara 1) 0) ) ))
+         
+         ((= cara 4) (cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(car(cadddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car cubo) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+
+         ((= cara 5) (cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar(cddddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (espejo (cadr(cddddr cubo)) dimension) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+         
+         ((= cara 6)(cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
+                           ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadddr cubo) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+         ))
+  ))
+
+;;FUNCION PARA ACTUALIZAR EL CUBO;;
 (define (actCubo cubo cara cont contCara result)
   (cond((null? cubo)result)
-  ((and (= cont 0) (= cara contCara)) (actCubo (cdr cubo) cara (+ cont 1) (+ contCara 1)  (append result (list(eliminar 0 (car cubo) 0)))) ) 
+  ((and (= cont 0) (= cara contCara)) (actCubo (cdr cubo) cara cont (+ contCara 1)  (append result (list(eliminar 0 (car cubo) 0)))) ) 
   (else(actCubo (cdr cubo) cara cont (+ contCara 1) (append result (list(car cubo)))))
  ))
 
+;;FUNCION PARA ELIMINAR ELEMENTO EN POSICION X DE UNA LISTA;;
 (define (eliminar elem lista cont)
   (cond
     [(null? lista) '()]  
     [(equal? cont elem) (eliminar elem (cdr lista) (+ cont 1))] 
     [else (cons (car lista) (eliminar elem (cdr lista) (+ cont 1)))]))
 
+;;FUNCION PARA OBTENER UN ELEMENTO EN POSICION X,Y DE UNA LISTA;;
 (define (obtener-elemento lista dimension fila columna)
   (obtener-posicion
    lista
@@ -202,5 +297,84 @@
     [(null? lista) '()]
     [else (obtener-posicion (cdr lista) (- indice 1))]))
 
-(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D F1D F2D F2D F1D F1D F2D F2D C2A C1B))
+;;FUNCION ROTACION ANTI-HORARIA;;
+(define (rotar-antihoraria lista dimension)
+  (rotar-antihoraria-aux 0 dimension lista))
+
+(define (rotar-antihoraria-aux col dimension lista)
+  (cond
+    [(= col dimension) '()]
+    [else
+     (append (obtener-columna lista dimension (- dimension col 1) 0)
+             (rotar-antihoraria-aux (+ col 1) dimension lista))]))
+
+;;FUNCION ROTACION HORARIA;;
+(define (rotar-horaria lista dimension)
+  (rotar-horaria-aux 0 dimension lista))
+
+(define (rotar-horaria-aux col dimension lista)
+  (cond
+    [(= col dimension) '()]
+    [else
+     (append (obtener-columna-al-reves lista dimension col dimension)
+             (rotar-horaria-aux (+ col 1) dimension lista))]))
+
+;;FUNCION OBTENER COLMUMNA;;
+(define (obtener-columna lista dimension columna actual)
+  (cond
+    [(null? lista) '()]
+    [(= (modulo actual dimension) columna)
+     (cons (car lista)
+           (obtener-columna (cdr lista) dimension columna (+ actual 1)))]
+    [else
+     (obtener-columna (cdr lista) dimension columna (+ actual 1))]))
+;;FUNCION OBTENER COLMUMNA-REVERSA;;
+(define (obtener-columna-al-reves lista dimension columna fila)
+  (cond
+    [(= fila 0) '()]
+    [else
+     (let ((pos (+ (* (- fila 1) dimension) columna)))
+       (cons (obtener-en-posicion lista pos)
+             (obtener-columna-al-reves lista dimension columna (- fila 1))))]))
+(define (obtener-en-posicion lista n)
+  (cond
+    [(zero? n) (car lista)]
+    [else (obtener-en-posicion (cdr lista) (- n 1))]))
+
+;;FUNCION ESPEJO HORIZONTAL;;
+(define (espejo lista dimension)
+  (cond
+    [(null? lista) '()]
+    [else
+     (append (invertir-fila (tomar lista dimension) dimension)
+             (espejo (saltar lista dimension) dimension))]))
+
+;;FUNCION ESPEJO VERTICAL;;
+(define (espejo-vertical lista dimension)
+  (cond
+    [(null? lista) '()]
+    [else
+     (append (espejo-vertical (saltar lista dimension) dimension)
+             (tomar lista dimension))]))
+
+;; Toma los primeros `n` elementos de la lista
+(define (tomar lista n)
+  (cond
+    [(or (null? lista) (= n 0)) '()]
+    [else (cons (car lista) (tomar (cdr lista) (- n 1)))]))
+
+;; Salta los primeros `n` elementos de la lista
+(define (saltar lista n)
+  (cond
+    [(or (null? lista) (= n 0)) lista]
+    [else (saltar (cdr lista) (- n 1))]))
+
+;; Invierte una lista de tamaño `n` usando solo cons y append
+(define (invertir-fila fila n)
+  (cond
+    [(null? fila) '()]
+    [else (append (invertir-fila (cdr fila) (- n 1)) (list (car fila)))]))
+
+(espejo '(1 2 3 4 ) 2)
+(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D C1A C2B F2I F1D))
 
