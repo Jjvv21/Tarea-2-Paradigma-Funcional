@@ -127,80 +127,31 @@
 
 
 (define (mov_fila_derecha dimension cubo n movimientos)
-  (display "Realizar movimiento fila: ")
+  (display "Realizar movimiento fila:")
   (display n)
-  (display " a la derecha")
+  (display "a la derecha")
   (newline)
-  (display (elegir_movimiento dimension (mov_derecha dimension cubo cubo n '() '() 1 0) (cdr movimientos))))
+  (elegir_movimiento dimension cubo (cdr movimientos)))
 
 (define (mov_fila_izquierda dimension cubo n movimientos)
-  (display "Realizar movimiento fila: ")
+  (display "Realizar movimiento fila:")
   (display n)
-  (display " a la izquierda")
+  (display "a la izquierda")
   (newline)
   (elegir_movimiento dimension cubo (cdr movimientos)))
 
 (define (mov_columna_arriba dimension cubo n movimientos)
-  (display "Realizar movimiento columna: ")
+  (display "Realizar movimiento columna:")
   (display n)
-  (display " hacia arriba")
+  (display "hacia arriba")
   (newline)
   (elegir_movimiento dimension cubo (cdr movimientos)))
 
 (define (mov_columna_abajo dimension cubo n movimientos)
-  (display "Realizar movimiento columna: ")
+  (display "Realizar movimiento columna:")
   (display n)
-  (display " hacia abajo")
+  (display "hacia abajo")
   (newline)
   (elegir_movimiento dimension cubo (cdr movimientos)))
 
-
-
-(define (mov_derecha dimension cuboOG cubo n result lista cara cuadro)
-  (cond((> cara 6) lista)
-  (else(cond((= cara 1)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (car cubo)))) (+ cara 1) 0))
-                           ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar cubo))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (caddr cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
-            
-         ((= cara 2)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (cadr cubo)))) (+ cara 1) 0))
-                           ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr cubo))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
-
-         ((= cara 3)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (caddr cubo)))) (+ cara 1) 0))
-                           ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caaddr cubo))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadr(cddddr cubo)) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
-         
-         ((= cara 4) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(cadddr cubo)))) (+ cara 1) 0) )
-         ((= cara 5) (mov_derecha dimension cuboOG cuboOG n '() (append lista (append result (list(car(cddddr cubo))))) (+ cara 1) 0) )
-         
-         ((= cara 6)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (caddr(cdddr cubo))))) (+ cara 1) 0))
-                           ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1 '()) n (append result (list(obtener-elemento (cadr cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
-         ))     
-  ))
-
-(define (actCubo cubo cara cont contCara result)
-  (cond((null? cubo)result)
-  ((and (= cont 0) (= cara contCara)) (actCubo (cdr cubo) cara (+ cont 1) (+ contCara 1)  (append result (list(eliminar 0 (car cubo) 0)))) ) 
-  (else(actCubo (cdr cubo) cara cont (+ contCara 1) (append result (list(car cubo)))))
- ))
-
-(define (eliminar elem lista cont)
-  (cond
-    [(null? lista) '()]  
-    [(equal? cont elem) (eliminar elem (cdr lista) (+ cont 1))] 
-    [else (cons (car lista) (eliminar elem (cdr lista) (+ cont 1)))]))
-
-(define (obtener-elemento lista dimension fila columna)
-  (obtener-posicion
-   lista
-   (+ (* dimension (- fila 1)) (- columna 1))))
-
-(define (obtener-posicion lista indice)
-  (cond
-    [(zero? indice) (car lista)]
-    [(null? lista) '()]
-    [else (obtener-posicion (cdr lista) (- indice 1))]))
-
-(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D F1D F2D F2D F1D F1D F2D F2D C2A C1B))
-
+(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D F2I C2A C1B))
