@@ -17,8 +17,7 @@
 
 (define (crear-lista-caras n)
   (define total (* n n))
-  (define cara (build-list total (λ (i) (add1 i)))) ; (1 2 3 4 ... n^2)
-  (build-list 6 (λ (_) cara))) ; ((1 2 3 4) (1 2 3 4) ...)
+  (build-list 6 (λ (i) (make-list total (add1 i))))) ; ((1 1 1 1) (2 2 2 2) ...)
 
 (define (list->face plano n)
   (define (fila i) (take (drop plano (* i n)) n))
@@ -66,7 +65,7 @@
   (draw-face dc ox oy face s (- (/ s 2)) 0 s))
 
 (define (draw-cube-front dc cube ox oy n)
-  (draw-top   dc ox       oy       (rotar-horario (rotar-horario (first  cube) n) n))
+  (draw-top   dc ox       oy       (espejo-horizontal(rotar-antihorario (first  cube) n) n))
   (draw-left  dc ox       oy       (espejo-horizontal (second cube) n))
   (draw-right dc ox       oy       (third  cube)))
 
@@ -77,83 +76,108 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Interfaz
+;; Variables y estado inicial (2x2 por defecto)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define initial-n 2)
+(define initial-lista (crear-lista-caras initial-n))
+(define initial-cubo (lista-a-cubo initial-lista initial-n))
+
+(define current-cube-n (box initial-n))
+(define current-cube1 (box (list (list-ref initial-cubo 3)
+                                 (list-ref initial-cubo 0)
+                                 (list-ref initial-cubo 1))))
+(define current-cube2 (box (list (list-ref initial-cubo 4)
+                                 (list-ref initial-cubo 2)
+                                 (list-ref initial-cubo 5))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Interfaz combinada
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define sticker-size 40)
-
-(define (crear-interfaz cube-n)
+(define current-lista-cara-plana (box '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6))))
+;; Función para redibujar canvas
+(define (draw-cube canvas dc)
+  (define cube-n (unbox current-cube-n))
   (define gap sticker-size)
   (define margin sticker-size)
   (define cube-extent (* 2 cube-n sticker-size))
-
   (define origin-x1 (+ margin (* cube-n sticker-size)))
   (define origin-y  (+ margin (* cube-n sticker-size)))
   (define origin-x2 (+ origin-x1 cube-extent gap))
 
-  (define canvas-width  
-    (+ (* 4 cube-n sticker-size) gap (* 2 margin)))
+  (draw-cube-front dc (unbox current-cube1) origin-x1 origin-y cube-n)
+  (draw-cube-back  dc (unbox current-cube2) origin-x2 origin-y cube-n))
 
-  (define canvas-height 
-    (+ (* 2 cube-n sticker-size) (* 2 margin)))
+;; Frame principal
+(define frame (new frame% [label "Rubik Simulator 3D"] [width 800] [height 600]))
+(define main-panel (new vertical-panel% [parent frame] [alignment '(center center)]))
 
-  (define frame
-    (new frame%
-         [label  "Rubik Simulator 3D"]
-         [width  canvas-width]
-         [height canvas-height]))
+;; Entrada para tamaño del cubo
+(define size-panel (new horizontal-panel% [parent main-panel]))
+(new message% [parent size-panel] [label "Tamaño del Cubo (2-6):"])
+(define size-input (new text-field% [parent size-panel] [label ""]))
 
-  (define lista-cara-plana (crear-lista-caras cube-n)) ; ((1 1 1 1) ...)
-  (define cubo-caras (lista-a-cubo lista-cara-plana cube-n))
+(define canvas #f) ; Será creado más adelante
 
-  (define cube1
-    (list (list-ref cubo-caras 3)   ;Cara arriba
-          (list-ref cubo-caras 0)   ;Cara izq
-          (list-ref cubo-caras 1))) ;Cara derecha
+(define (generar-cubo! n)
+  (set-box! current-cube-n n)
+  (define lista-cara-plana (crear-lista-caras n))
+  (set-box! current-lista-cara-plana lista-cara-plana)
+  (define cubo-caras (lista-a-cubo lista-cara-plana n))
+  (set-box! current-cube1
+            (list (list-ref cubo-caras 3)   ; arriba
+                  (list-ref cubo-caras 0)   ; izq
+                  (list-ref cubo-caras 1))) ; der
+  (set-box! current-cube2
+            (list (list-ref cubo-caras 4)   ; frente
+                  (list-ref cubo-caras 2)   ; abajo
+                  (list-ref cubo-caras 5))) ; fondo
+  (send canvas refresh))
 
-  (define cube2
-    (list (list-ref cubo-caras 4)
-          (list-ref cubo-caras 2)
-          (list-ref cubo-caras 5)))
+(new button%
+     [parent size-panel]
+     [label "Crear Cubo"]
+     [callback
+      (λ (_ evt)
+        (define val (string->number (send size-input get-value)))
+        (if (and val (integer? val) (<= 2 val 6))
+            (generar-cubo! val)
+            (message-box "Error" "Por favor ingresa un número entre 2 y 6")))])
 
-  (new canvas%
-       [parent     frame]
-       [min-width  canvas-width]
-       [min-height canvas-height]
-       [paint-callback
-        (λ (canvas dc)
-          (draw-cube-front dc cube1 origin-x1 origin-y cube-n)
-          (draw-cube-back dc cube2 origin-x2 origin-y cube-n))])
+;; Canvas para dibujo del cubo
+(set! canvas
+      (new canvas%
+           [parent     main-panel]
+           [min-width  1100]
+           [min-height 600]
+           [paint-callback draw-cube]))
 
-  (send frame show #t)
-  (printf "Lista usada: ~a\n" lista-cara-plana)) ; Para ver en consola
+;; Sección para ingresar movimiento
+(new message% [parent main-panel] [label "Movimiento a Realizar:"])
+(define mov-input (new text-field% [parent main-panel] [label ""]))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Interfaz para entrada de número
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(new button%
+     [parent main-panel]
+     [label "Enviar"]
+     [callback
+      (λ (_ evt)
+        (define mov (send mov-input get-value))
+        (printf "Movimiento ingresado: ~a\n" mov)
+        (set-box! current-lista-cara-plana (leer_movimientos (unbox current-cube-n) (unbox current-lista-cara-plana) (list mov) '()))
+        (define cubo-caras (lista-a-cubo (unbox current-lista-cara-plana) (unbox current-cube-n)))
+        (set-box! current-cube1
+            (list (list-ref cubo-caras 3)   ; arriba
+                  (list-ref cubo-caras 0)   ; izq
+                  (list-ref cubo-caras 1))) ; der
+        (set-box! current-cube2
+            (list (list-ref cubo-caras 4)   ; frente
+                  (list-ref cubo-caras 2)   ; abajo
+                  (list-ref cubo-caras 5))) ; fondo
+        (send canvas refresh))])
 
-(define entrada-frame (new frame% [label "Tamaño del Cubo"] [width 300] [height 100]))
-(define panel (new horizontal-panel% [parent entrada-frame]))
-
-(new message% [parent panel] [label "Introduce tamaño (2-6):"])
-
-(define txt (new text-field% [parent panel] [label ""]))
-(define btn
-  (new button%
-       [parent panel]
-       [label "Crear Cubo"]
-       [callback
-        (λ (canvas dc)
-          (define val (string->number (send txt get-value)))
-          (cond
-            [(and val (integer? val) (<= 2 val 6))
-             (send entrada-frame show #f)
-             (crear-interfaz val)]
-            [else (message-box "Error" "Por favor ingresa un número entre 2 y 6")]))]))
-
-(send entrada-frame show #t)
-
-
+(send frame show #t)
 
 (define (rotar-horario face n)
   ;; Lógica de rotación horaria para una cara NxN

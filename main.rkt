@@ -1,5 +1,5 @@
 #lang racket
-
+(provide leer_movimientos)
 
 ;; FUNCION PRINCIPAL;;; 
 ;  Funcion principal del programa para inicializar, dar dimension y mover el cubo
@@ -91,7 +91,7 @@
       dimension
       cubo
       (cdr simbolos)
-      (append lista_movimientos (list (symbol->string (car simbolos)))))])) ;; se hace una llamada recursiva para ir creando la lista con los string de cada movimiento (conversion simbolo a string)
+      (append lista_movimientos (list (car simbolos))))])) ;; se hace una llamada recursiva para ir creando la lista con los string de cada movimiento (conversion simbolo a string)
 
 
 ;; Función auxiliar para crear una nueva lista con los movimientos explicitos el entero que sugiere cual fila o columna se debe mover y el movimiento de esta si es
@@ -191,7 +191,7 @@
          
          ((= cara 6)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (caddr(cdddr cubo))))) (+ cara 1) 0))
                            ((< cuadro (* dimension (- n 1)))(mov_derecha dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
-                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1 '()) n (append result (list(obtener-elemento (cadr cubo) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
+                           (else (mov_derecha dimension cuboOG (actCubo cubo cara 0 1 '()) n (append result (list(obtener-elemento (espejo (cadr cubo) dimension) dimension n (+ (modulo cuadro dimension) 1)))) lista cara (+ cuadro 1)))   ))
          ))     
   ))
 
@@ -245,7 +245,7 @@
          
          ((= cara 6)(cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
                            ((not(= (modulo cuadro dimension) (- n 1)))(mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
-                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (car(cddddr cubo)) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+                           (else (mov_abajo dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (car(cddddr cubo)) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
          ))
   ))
 
@@ -268,11 +268,11 @@
 
          ((= cara 5) (cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
                            ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caar(cddddr cubo)))) lista cara (+ cuadro 1)))
-                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (espejo (cadr(cddddr cubo)) dimension) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (cadr(cddddr cubo)) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
          
          ((= cara 6)(cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
                            ((not(= (modulo cuadro dimension) (- n 1)))(mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(caadr(cddddr cubo)))) lista cara (+ cuadro 1)))
-                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (cadddr cubo) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
+                           (else (mov_arriba dimension cuboOG (actCubo cubo cara 0 1  '()) n (append result (list(obtener-elemento (espejo-vertical (cadddr cubo) dimension) dimension (+ (quotient cuadro dimension) 1) n ))) lista cara (+ cuadro 1)))   ))
          ))
   ))
 
@@ -392,5 +392,5 @@
 
 
 ;;INICIALIZAR CUBO;;
-(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D C1A C2B F2I F1D))
+;(RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '())
 
