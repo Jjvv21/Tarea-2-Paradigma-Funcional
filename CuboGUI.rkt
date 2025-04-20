@@ -1,4 +1,5 @@
 #lang racket/gui
+(require "main.rkt")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utilidades
@@ -16,7 +17,8 @@
 
 (define (crear-lista-caras n)
   (define total (* n n))
-  (build-list 6 (λ (i) (make-list total (add1 i))))) ; ((1 1 1 1) (2 2 2 2) ...)
+  (define cara (build-list total (λ (i) (add1 i)))) ; (1 2 3 4 ... n^2)
+  (build-list 6 (λ (_) cara))) ; ((1 2 3 4) (1 2 3 4) ...)
 
 (define (list->face plano n)
   (define (fila i) (take (drop plano (* i n)) n))
@@ -63,10 +65,16 @@
   (define s sticker-size)
   (draw-face dc ox oy face s (- (/ s 2)) 0 s))
 
-(define (draw-cube dc cube ox oy)
-  (draw-top   dc ox       oy       (first  cube))
-  (draw-left  dc ox       oy       (second cube))
+(define (draw-cube-front dc cube ox oy n)
+  (draw-top   dc ox       oy       (rotar-horario (rotar-horario (first  cube) n) n))
+  (draw-left  dc ox       oy       (espejo-horizontal (second cube) n))
   (draw-right dc ox       oy       (third  cube)))
+
+(define (draw-cube-back dc cube ox oy n)
+  (draw-top   dc ox       oy       (espejo-vertical (first  cube) n))
+  (draw-left  dc ox       oy       (espejo-vertical(second cube) n))
+  (draw-right dc ox       oy       (espejo-vertical (third  cube) n)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interfaz
@@ -114,8 +122,8 @@
        [min-height canvas-height]
        [paint-callback
         (λ (canvas dc)
-          (draw-cube dc cube1 origin-x1 origin-y)
-          (draw-cube dc cube2 origin-x2 origin-y))])
+          (draw-cube-front dc cube1 origin-x1 origin-y cube-n)
+          (draw-cube-back dc cube2 origin-x2 origin-y cube-n))])
 
   (send frame show #t)
   (printf "Lista usada: ~a\n" lista-cara-plana)) ; Para ver en consola
@@ -144,3 +152,23 @@
             [else (message-box "Error" "Por favor ingresa un número entre 2 y 6")]))]))
 
 (send entrada-frame show #t)
+
+
+
+(define (rotar-horario face n)
+  ;; Lógica de rotación horaria para una cara NxN
+  (for/list ([j (in-range n)])
+    (for/list ([i (in-range (sub1 n) -1 -1)])
+      (list-ref (list-ref face i) j))))
+
+(define (espejo-horizontal face n)
+  (for/list ([fila face])
+    (reverse fila)))
+
+(define (rotar-antihorario face n)
+  (for/list ([j (in-range (sub1 n) -1 -1)])
+    (for/list ([i (in-range n)])
+      (list-ref (list-ref face i) j))))
+
+(define (espejo-vertical face n)
+  (reverse face))
