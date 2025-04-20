@@ -12,6 +12,7 @@
     [(not (cubo-Valido? X Cubo)) (Mensaje_Error_1)] ;funcion que verifica que la matriz sea de las dimensiones correctas segun el parametro x, si tiene dimensiones incorrectas devuelve true
     [else (leer_movimientos X Cubo Movs '())]))
 
+;; FIN FUNCION PRINCIPAL;;
 
 ;;; FUNCIONES DE VALIDACIÓN DE PARAMETROS ;;;;;;
 
@@ -63,6 +64,7 @@
     [(or (< (car lista) 1) (> (car lista) 6)) #f]
     [else (colores-Valido? (cdr lista))])) ; Continuar revisando
 
+;;; FIN FUNCIONES DE VALIDACIÓN DE PARAMETROS ;;;;;;
 
 ;;;; MENSAJES DE ERROR ;;;; 
 ;Mensaje de error por si la lista con los movimientos esta vacía o si el cubo no se inicializó bien con la matriz
@@ -76,8 +78,9 @@
 (define (Mensaje_Error_3)
   (error "Error en la lista de movimientos, se encontró un movimiento no válido"))
 
+;;;; FIN MENSAJES DE ERROR ;;;;
 
-;;;; FUNCION PARA LAS INSTRUCCIONES DE MOVIMIENTO DEL CUBO ;;;;
+;;;; FUNCIONES PARA LAS INSTRUCCIONES DE MOVIMIENTO DEL CUBO ;;;;
 
 ;Funcion principal para leer los movimientos que se le quieren dar al cubo
 (define (leer_movimientos dimension cubo simbolos lista_movimientos)
@@ -162,7 +165,9 @@
   (newline)
   (elegir_movimiento dimension (mov_abajo dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
+;;;; FIN FUNCIONSE PARA LAS INSTRUCCIONES DE MOVIMIENTO DEL CUBO ;;;;
 
+;;; FUNCIONES LOGICA MOVIMIENTOS ;;;
 ;;FUNCION LOGICA MOVIMIENTO FILA A LA DERECHA;;
 (define (mov_derecha dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
@@ -278,24 +283,16 @@
   (else(actCubo (cdr cubo) cara cont (+ contCara 1) (append result (list(car cubo)))))
  ))
 
+;;;FIN FUNCIONES LOGICA MOVIMIENTOS ;;;
+
+
+;;; FUNCIONES PARA MODIFICAR LISTAS ;;;
 ;;FUNCION PARA ELIMINAR ELEMENTO EN POSICION X DE UNA LISTA;;
 (define (eliminar elem lista cont)
   (cond
     [(null? lista) '()]  
     [(equal? cont elem) (eliminar elem (cdr lista) (+ cont 1))] 
     [else (cons (car lista) (eliminar elem (cdr lista) (+ cont 1)))]))
-
-;;FUNCION PARA OBTENER UN ELEMENTO EN POSICION X,Y DE UNA LISTA;;
-(define (obtener-elemento lista dimension fila columna)
-  (obtener-posicion
-   lista
-   (+ (* dimension (- fila 1)) (- columna 1))))
-
-(define (obtener-posicion lista indice)
-  (cond
-    [(zero? indice) (car lista)]
-    [(null? lista) '()]
-    [else (obtener-posicion (cdr lista) (- indice 1))]))
 
 ;;FUNCION ROTACION ANTI-HORARIA;;
 (define (rotar-antihoraria lista dimension)
@@ -319,28 +316,6 @@
      (append (obtener-columna-al-reves lista dimension col dimension)
              (rotar-horaria-aux (+ col 1) dimension lista))]))
 
-;;FUNCION OBTENER COLMUMNA;;
-(define (obtener-columna lista dimension columna actual)
-  (cond
-    [(null? lista) '()]
-    [(= (modulo actual dimension) columna)
-     (cons (car lista)
-           (obtener-columna (cdr lista) dimension columna (+ actual 1)))]
-    [else
-     (obtener-columna (cdr lista) dimension columna (+ actual 1))]))
-;;FUNCION OBTENER COLMUMNA-REVERSA;;
-(define (obtener-columna-al-reves lista dimension columna fila)
-  (cond
-    [(= fila 0) '()]
-    [else
-     (let ((pos (+ (* (- fila 1) dimension) columna)))
-       (cons (obtener-en-posicion lista pos)
-             (obtener-columna-al-reves lista dimension columna (- fila 1))))]))
-(define (obtener-en-posicion lista n)
-  (cond
-    [(zero? n) (car lista)]
-    [else (obtener-en-posicion (cdr lista) (- n 1))]))
-
 ;;FUNCION ESPEJO HORIZONTAL;;
 (define (espejo lista dimension)
   (cond
@@ -357,6 +332,44 @@
      (append (espejo-vertical (saltar lista dimension) dimension)
              (tomar lista dimension))]))
 
+;;; FIN FUNCIONES PARA MODIFICAR LISTAS ;;;
+
+;;; FUNCIONES PARA OBTENER DATOS DE UNA LISTA ;;;
+;;FUNCION PARA OBTENER UN ELEMENTO EN POSICION X,Y DE UNA LISTA;;
+(define (obtener-elemento lista dimension fila columna)
+  (obtener-posicion
+   lista
+   (+ (* dimension (- fila 1)) (- columna 1))))
+
+(define (obtener-posicion lista indice)
+  (cond
+    [(zero? indice) (car lista)]
+    [(null? lista) '()]
+    [else (obtener-posicion (cdr lista) (- indice 1))]))
+
+;;FUNCION OBTENER COLMUMNA;;
+(define (obtener-columna lista dimension columna actual)
+  (cond
+    [(null? lista) '()]
+    [(= (modulo actual dimension) columna)
+     (cons (car lista)
+           (obtener-columna (cdr lista) dimension columna (+ actual 1)))]
+    [else
+     (obtener-columna (cdr lista) dimension columna (+ actual 1))]))
+
+;;FUNCION OBTENER COLMUMNA-REVERSA;;
+(define (obtener-columna-al-reves lista dimension columna fila)
+  (cond
+    [(= fila 0) '()]
+    [else
+     (let ((pos (+ (* (- fila 1) dimension) columna)))
+       (cons (obtener-en-posicion lista pos)
+             (obtener-columna-al-reves lista dimension columna (- fila 1))))]))
+(define (obtener-en-posicion lista n)
+  (cond
+    [(zero? n) (car lista)]
+    [else (obtener-en-posicion (cdr lista) (- n 1))]))
+
 ;; Toma los primeros `n` elementos de la lista
 (define (tomar lista n)
   (cond
@@ -369,12 +382,15 @@
     [(or (null? lista) (= n 0)) lista]
     [else (saltar (cdr lista) (- n 1))]))
 
-;; Invierte una lista de tamaño `n` usando solo cons y append
+;; Invierte una lista de tamaño `n`
 (define (invertir-fila fila n)
   (cond
     [(null? fila) '()]
     [else (append (invertir-fila (cdr fila) (- n 1)) (list (car fila)))]))
 
-(espejo '(1 2 3 4 ) 2)
+;;; FIN FUNCIONES PARA OBTENER DATOS DE UNA LISTA ;;;
+
+
+;;INICIALIZAR CUBO;;
 (RS 2 '((1 1 1 1) (2 2 2 2) (3 3 3 3) (4 4 4 4) (5 5 5 5) (6 6 6 6)) '(F1D C1A C2B F2I F1D))
 
