@@ -128,8 +128,7 @@
     [(and (string=? (caar movs) "columna") (string=? (caddr(car movs))"abajo"))(mov_columna_abajo dimension cubo (cadar movs) movs)]
     [else (Mensaje_Error_3)]))
 
-;;CONTROL DE MOVIMIENTOS;;
-;Imprime el estado actual del cubo y luego llama a la funcion de movimiento a la derecha;
+
 (define (mov_fila_derecha dimension cubo n movimientos)
   (display cubo)
   (newline)
@@ -139,7 +138,6 @@
   (newline)
   (elegir_movimiento dimension (mov_derecha dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
-;Imprime el estado actual del cubo y luego llama a la funcion de movimiento a la izquierda;
 (define (mov_fila_izquierda dimension cubo n movimientos)
   (display cubo)
   (newline)
@@ -149,7 +147,6 @@
   (newline)
   (elegir_movimiento dimension (mov_izquierda dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
-;Imprime el estado actual del cubo y luego llama a la funcion de movimiento hacia arriba;
 (define (mov_columna_arriba dimension cubo n movimientos)
   (display cubo)
   (newline)
@@ -159,7 +156,6 @@
   (newline)
   (elegir_movimiento dimension (mov_arriba dimension cubo cubo n '() '() 1 0) (cdr movimientos)))
 
-;Imprime el estado actual del cubo y luego llama a la funcion de movimiento hacia abajo;
 (define (mov_columna_abajo dimension cubo n movimientos)
   (display cubo)
   (newline)
@@ -173,8 +169,6 @@
 
 ;;; FUNCIONES LOGICA MOVIMIENTOS ;;;
 ;;FUNCION LOGICA MOVIMIENTO FILA A LA DERECHA;;
-;;Se recorre cuadrante por cuadrante la cara copiando la referencia hasta llegar a la fila deseada,
-;;al llegar a esta se copian los valores de la cara esperada, y al terminar se copia el resto de la cara original
 (define (mov_derecha dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
   (else(cond((= cara 1)(cond((>= cuadro (* dimension n)) (mov_derecha dimension cuboOG cuboOG n '() (append lista (list(append result (car cubo)))) (+ cara 1) 0))
@@ -202,8 +196,6 @@
   ))
 
 ;;FUNCION LOGICA MOVIMIENTO FILA A LA IZQUIERDA;;
-;;Se recorre cuadrante por cuadrante la cara copiando la referencia hasta llegar a la fila deseada,
-;;al llegar a esta se copian los valores de la cara esperada, y al terminar se copia el resto de la cara original
 (define (mov_izquierda dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
   (else(cond((= cara 1)(cond((>= cuadro (* dimension n)) (mov_izquierda dimension cuboOG cuboOG n '() (append lista (list(append result (car cubo)))) (+ cara 1) 0))
@@ -231,8 +223,6 @@
   ))
 
 ;;FUNCION LOGICA MOVIMIENTO COLUMNA HACIA ABAJO;;
-;;Se recorre cuadrante por cuadrante la cara copiando la referencia hasta llegar a la columna deseada,
-;;al llegar a esta se copian los valores de la cara esperada, y al terminar se copia el resto de la cara original
 (define (mov_abajo dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
   (else(cond((= cara 1)(cond((>= cuadro (* dimension dimension)) (mov_abajo dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
@@ -260,8 +250,6 @@
   ))
 
 ;;FUNCION LOGICA MOVIMIENTO COLUMNA HACIA ARRIBA;;
-;;Se recorre cuadrante por cuadrante la cara copiando la referencia hasta llegar a la columna deseada,
-;;al llegar a esta se copian los valores de la cara esperada, y al terminar se copia el resto de la cara original
 (define (mov_arriba dimension cuboOG cubo n result lista cara cuadro)
   (cond((> cara 6) lista)
   (else(cond((= cara 1)(cond((>= cuadro (* dimension dimension)) (mov_arriba dimension cuboOG cuboOG n '() (append lista (list result)) (+ cara 1) 0))
